@@ -24,6 +24,25 @@ std::vector<int64_t> CreateThreadCountRange() {
   return range;
 }
 
+static void BM_ThreadCreation(benchmark::State &state) {
+  for (auto _ : state) {
+    std::thread t(DoSomething);
+    t.join();
+  }
+}
+
+// Register the function as a benchmark
+BENCHMARK(BM_ThreadCreation)->UseRealTime();
+static void BM_SingleThreadSum(benchmark::State &state) {
+  for (auto _ : state)
+    holistic_multithreading::SingleThreadSum(1, state.range(0));
+}
+// Register the function as a benchmark
+BENCHMARK(BM_SingleThreadSum)
+    ->RangeMultiplier(kMultiplier)
+    ->Range(kStart, kEnd)
+    ->UseRealTime();
+
 static void BM_MultithreadedSum(benchmark::State &state) {
   for (auto _ : state)
     holistic_multithreading::MultithreadedSum(1, state.range(0),
@@ -35,25 +54,6 @@ BENCHMARK(BM_MultithreadedSum)
     ->ArgsProduct({benchmark::CreateRange(kStart, kEnd, kMultiplier),
                    CreateThreadCountRange()})
     ->UseRealTime();
-
-static void BM_SingleThreadSum(benchmark::State &state) {
-  for (auto _ : state)
-    holistic_multithreading::SingleThreadSum(1, state.range(0));
-}
-// Register the function as a benchmark
-BENCHMARK(BM_SingleThreadSum)
-    ->RangeMultiplier(kMultiplier)
-    ->Range(kStart, kEnd)
-    ->UseRealTime();
-
-static void BM_ThreadCreation(benchmark::State &state) {
-  for (auto _ : state) {
-    std::thread t(DoSomething);
-    t.join();
-  }
-}
-// Register the function as a benchmark
-BENCHMARK(BM_ThreadCreation)->UseRealTime();
 
 } // namespace
 } // namespace holistic_multithreading
