@@ -1,0 +1,11 @@
+cc_library(
+  name = "sum_ints",
+  hdrs = ["sum_ints.h"],
+  srcs = ["sum_ints.cc"],
+)
+
+cc_binary(
+  name = "sum_ints_benchmark",
+  srcs = ["sum_ints_benchmark.cc"],
+  deps = ["@google_benchmark//:benchmark", "//:sum_ints"]
+)
